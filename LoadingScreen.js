@@ -7,11 +7,11 @@ const LoadingScreen = ({ navigation }) => {
   useEffect(() => {
     const timer = setInterval(() => {
       setStep((prevStep) => prevStep + 1); // Show the next part of the text
-    }, 1000); // 1-second delay between each step
+    }, 800); 
 
     const navigateTimer = setTimeout(() => {
       navigation.navigate('WelcomeScreen'); // Navigate to WelcomeScreen after all text is shown
-    }, 4000); // Total duration is 4 seconds
+    }, 2500); 
 
     return () => {
       clearInterval(timer);
@@ -23,8 +23,8 @@ const LoadingScreen = ({ navigation }) => {
     <View style={styles.container}>
       {step >= 0 && <Text style={styles.text}>L</Text>}
       {step >= 1 && <Text style={styles.text}>u</Text>}
-      {step >= 2 && <Text style={styles.text}>m</Text>}
-      {step >= 3 && <Text style={styles.text}>iLearn</Text>}
+      {step >= 2 && <Text style={styles.text}>mi</Text>}
+      {step >= 3 && <Text style={styles.text}>Learn</Text>}
     </View>
   );
 };
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#151B54', // Dark blue background
+    backgroundColor: '#151B54', 
   },
   text: {
     fontSize: 50,
