@@ -14,6 +14,11 @@ import CoursesScreen from './LecturerSec/CoursesSec';
 import Quizzes from './LecturerSec/QuizzesSec';
 import SetQuiz from './LecturerSec/SetQuiz';
 import Tracker from './StudentSec/Tracker/TrackerHome';
+import ChatScreen from './StudentSec/AIbot';
+import Assignments from './LecturerSec/Assignment';
+import CoursePerformance from './LecturerSec/CoursePerformance';
+import SendFeedback from './LecturerSec/SendFeedback';
+import LecturerCourses from './LecturerSec/LecturerCourses';
 
 
 const Stack = createStackNavigator();
@@ -68,7 +73,41 @@ export default function App() {
               
                 }}
             />
-
+            <Stack.Screen name='ChatScreen' component={ChatScreen}
+                                  options={{
+                                    headerShown: true,
+                                    headerTitle: 'AI BOT',
+                                    headerBackTitle: 'Back',
+                                      }}
+            />
+            <Stack.Screen name='Assignment' component={Assignments}
+                                  options={{
+                                    headerShown: true,
+                                    headerTitle: 'Assignment',
+                                    headerBackTitle: 'Back',
+                                      }}
+            />
+            <Stack.Screen name='CoursePerformance' component={CoursePerformance}
+                                              options={{
+                                                headerShown: true,
+                                                headerTitle: 'Student Perfomance',
+                                                headerBackTitle: 'Back',
+                                                  }}
+            />
+            <Stack.Screen name='SendFeedback' component={SendFeedback}
+                                              options={{
+                                                headerShown: true,
+                                                headerTitle: 'Feedback',
+                                                headerBackTitle: 'Back',
+                                                  }}
+            />
+             <Stack.Screen name='LecturerCourses' component={LecturerCourses}
+                                              options={{
+                                                headerShown: true,
+                                                headerTitle: 'Feedback',
+                                                headerBackTitle: 'Back',
+                                                  }}
+            />
       </Stack.Navigator>
     </NavigationContainer>
   );

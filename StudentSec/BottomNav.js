@@ -9,7 +9,7 @@ export const BottomMenu = () => {
   return (
     <View style={styles.bottomMenu}>
       <MenuItem label="Home" icon="home" onPress={() => navigation.navigate('Home')} />
-      <MenuItem label="Chat" icon="envelope" onPress={() => navigation.navigate('Stud_course')} />
+      <MenuItem label="Chat" icon="envelope" onPress={() => navigation.navigate('ChatScreen')} />
       <MenuItem label="Tracker" icon="map" onPress={() => navigation.navigate('Tracker')} />
       <MenuItem label="Fundraising" icon="dollar-sign" onPress={() => navigation.navigate('Fundraising')} />
       <MenuItem label="Profile" icon="user" onPress={() => navigation.navigate('ManageProfile')} />

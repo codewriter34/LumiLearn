@@ -63,6 +63,35 @@ const LecturerHome = ({ navigation }) => {
           <Text style={styles.welcomeText}>Welcome</Text>
           <Text style={styles.lecturerName}>{lecturerName}</Text>
         </View>
+
+        {/* View Course Performance Section */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionHeader}>View Course Performance</Text>
+          <Text style={styles.sectionDescription}>
+            Check the performance of your courses and see how students are doing.
+          </Text>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={() => navigation.navigate('LecturerCourses')}
+          >
+            <Text style={styles.buttonText}>View Course Performance</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Send Feedback Section */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionHeader}>Send Feedback</Text>
+          <Text style={styles.sectionDescription}>
+            Provide valuable feedback to your students to help them improve.
+          </Text>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={() => navigation.navigate('SendFeedback')}
+          >
+            <Text style={styles.buttonText}>Send Feedback</Text>
+          </TouchableOpacity>
+        </View>
+
       </ScrollView>      
       <BottomMenu navigation={navigation} />
     </View>
@@ -116,6 +145,33 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 10, 
+  },
+  sectionContainer: {
+    marginTop: 30,
+    marginHorizontal: 20,
+  },
+  sectionHeader: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#151B54',
+  },
+  sectionDescription: {
+    fontSize: 16,
+    color: '#555',
+    marginTop: 5,
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: '#151B54',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 
