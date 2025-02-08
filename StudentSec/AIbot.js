@@ -5,7 +5,7 @@ import OpenAI from 'openai';
 import { getAuth } from 'firebase/auth';
 
 const openai = new OpenAI({
-  apiKey: "your-openai-api-key",
+  apiKey: "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", 
 });
 
 const ChatScreen = () => {
@@ -67,7 +67,7 @@ const ChatScreen = () => {
 
     try {
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-3.5-turbo",  // Use a valid model name
         messages: [{ role: "user", content: input }],
       });
 
@@ -77,10 +77,19 @@ const ChatScreen = () => {
       };
       setMessages((prevMessages) => [...prevMessages, botMessage]);
     } catch (error) {
-      const errorMessage = {
-        text: "Error communicating with the AI. Please try again.",
-        sender: 'bot',
-      };
+      console.error('OpenAI API Error:', error);
+      let errorMessage;
+      if (error.response && error.response.status === 429) {
+        errorMessage = {
+          text: "You have exceeded your quota. Please check your OpenAI plan and billing details.",
+          sender: 'bot',
+        };
+      } else {
+        errorMessage = {
+          text: `Error communicating with the AI: ${error.message}`,
+          sender: 'bot',
+        };
+      }
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
     }
 

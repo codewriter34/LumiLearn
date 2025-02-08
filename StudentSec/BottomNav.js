@@ -11,8 +11,10 @@ export const BottomMenu = () => {
       <MenuItem label="Home" icon="home" onPress={() => navigation.navigate('Home')} />
       <MenuItem label="Chat" icon="envelope" onPress={() => navigation.navigate('ChatScreen')} />
       <MenuItem label="Tracker" icon="map" onPress={() => navigation.navigate('Tracker')} />
-      <MenuItem label="Fundraising" icon="dollar-sign" onPress={() => navigation.navigate('Fundraising')} />
-      <MenuItem label="Profile" icon="user" onPress={() => navigation.navigate('ManageProfile')} />
+      <MenuItem label="Assignments" icon="clipboard-list" onPress={() => navigation.navigate('Assignment')} />
+
+      <MenuItem label="Profile" icon="user" onPress={() => navigation.navigate('Profile')} />
+
     </View>
   );
 };

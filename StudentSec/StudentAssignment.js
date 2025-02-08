@@ -9,9 +9,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 import * as DocumentPicker from 'expo-document-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const Assignments = ({ navigation }) => {
-
-  const [lecturerId, setLecturerId] = useState(null);
+const StudentAssignment = ({ navigation }) => {
+  const [studentId, setStudentId] = useState(null);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -24,7 +23,7 @@ const Assignments = ({ navigation }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setLecturerId(user.uid);
+        setStudentId(user.uid);
       } else {
         console.error('No user is logged in.');
       }
@@ -34,10 +33,10 @@ const Assignments = ({ navigation }) => {
 
   useEffect(() => {
     const fetchCourses = async () => {
-      if (!lecturerId) return;
+      if (!studentId) return;
       try {
         const coursesRef = collection(db, 'courses');
-        const q = query(coursesRef, where('lecturerId', '==', lecturerId));
+        const q = query(coursesRef, where('studentId', '==', studentId));
         const querySnapshot = await getDocs(q);
         setCourses(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       } catch (error) {
@@ -46,7 +45,7 @@ const Assignments = ({ navigation }) => {
       setLoading(false);
     };
     fetchCourses();
-  }, [lecturerId]);
+  }, [studentId]);
 
   const handleFileUpload = async () => {
     try {
@@ -61,7 +60,6 @@ const Assignments = ({ navigation }) => {
         const response = await fetch(file.uri);
         const blob = await response.blob();
   
-        // 🔹 Generate a safe filename (no spaces/special characters)
         const safeFileName = file.name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._-]/g, '');
         const uniqueFileName = `${Date.now()}_${safeFileName}`;
   
@@ -83,7 +81,6 @@ const Assignments = ({ navigation }) => {
       return null;
     }
   };
-  
 
   const handleSubmitAssignment = async () => {
     if (!selectedCourse) {
@@ -91,7 +88,7 @@ const Assignments = ({ navigation }) => {
       return;
     }
     if (!assignmentText && !selectedFile) {
-      alert('Please enter a fundraising detail or upload a file.');
+      alert('Please enter assignment details or upload a file.');
       return;
     }
 
@@ -109,7 +106,7 @@ const Assignments = ({ navigation }) => {
 
     try {
       await addDoc(collection(db, 'assignments'), {
-        lecturerId,
+        studentId,
         courseId: selectedCourse.id,
         courseName: selectedCourse.courseName,
         assignmentText,
@@ -118,7 +115,7 @@ const Assignments = ({ navigation }) => {
         deadline: deadline.toISOString(),
         createdAt: new Date().toISOString(),
       });
-      alert('Fundraising submitted successfully!');
+      alert('Assignment submitted successfully!');
       setAssignmentText('');
       setSelectedFile(null);
       setFileUrl(null);
@@ -139,7 +136,7 @@ const Assignments = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Submit Fundraising</Text>
+      <Text style={styles.title}>Submit Assignment</Text>
 
       {courses.map(course => (
         <TouchableOpacity key={course.id} style={[styles.courseItem, selectedCourse?.id === course.id && styles.selectedCourse]} onPress={() => setSelectedCourse(course)}>
@@ -246,4 +243,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Assignments;
+export default StudentAssignment;
