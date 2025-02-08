@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -19,7 +18,8 @@ import Assignments from './LecturerSec/Assignment';
 import CoursePerformance from './LecturerSec/CoursePerformance';
 import SendFeedback from './LecturerSec/SendFeedback';
 import LecturerCourses from './LecturerSec/LecturerCourses';
-
+import StudentAssignment from './StudentSec/StudentAssignment'; // Importing the new StudentAssignment
+import ProfileScreen from './StudentSec/ProfileScreen';
 
 const Stack = createStackNavigator();
 
@@ -105,6 +105,19 @@ export default function App() {
                                               options={{
                                                 headerShown: true,
                                                 headerTitle: 'Feedback',
+                                                headerBackTitle: 'Back',
+                                                  }}
+            />
+            <Stack.Screen name='StudentAssignment' component={StudentAssignment} 
+                                              options={{
+                                                headerShown: true,
+                                                headerBackTitle: 'Back',
+                                                  }}
+            />
+                        <Stack.Screen name='Profile' component={ProfileScreen} 
+                                              options={{
+                                                headerShown: true,
+                                                headerTitle: 'Profile',
                                                 headerBackTitle: 'Back',
                                                   }}
             />
