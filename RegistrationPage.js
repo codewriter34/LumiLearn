@@ -81,10 +81,18 @@ const RegisterScreen = ({ navigation }) => {
         Alert.alert('Success', 'Logged in successfully!');
 
         // Redirect based on role
-        if (role === 'Student') {
-          navigation.replace('StudentSec/Home');
-        } else if (role === 'Lecturer') {
-          navigation.replace('LecturerSec/Home');
+        switch (role) {
+          case 'Student':
+            navigation.replace('StudentSec/Home');
+            break;
+          case 'Lecturer':
+            navigation.replace('LecturerSec/Home');
+            break;
+          case 'Admin':
+            navigation.replace('AdminDashboard');
+            break;
+          default:
+            setErrorMessage('User role not recognized. Please contact support.');
         }
       } else {
         setErrorMessage('User data not found. Please contact support.');
