@@ -1,4 +1,5 @@
 import React from 'react';
+import AdminDashboard from './AdminSec/AdminDashboard';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoadingScreen from './LoadingScreen';
@@ -18,7 +19,7 @@ import Assignments from './LecturerSec/Assignment';
 import CoursePerformance from './LecturerSec/CoursePerformance';
 import SendFeedback from './LecturerSec/SendFeedback';
 import LecturerCourses from './LecturerSec/LecturerCourses';
-import StudentAssignment from './StudentSec/StudentAssignment'; // Importing the new StudentAssignment
+import StudentAssignment from './StudentSec/StudentAssignment'; 
 import ProfileScreen from './StudentSec/ProfileScreen';
 
 const Stack = createStackNavigator();
@@ -30,7 +31,8 @@ export default function App() {
         <Stack.Screen name="LoadingScreen" component={LoadingScreen} />
         <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
         <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
-        <Stack.Screen name="StudentSec/Home" component={StudentHome} />
+        <Stack.Screen name="AdminDashboard" component={AdminDashboard} />
+      <Stack.Screen name="StudentSec/Home" component={StudentHome} />
         <Stack.Screen name="LecturerSec/Home" component={LecturerHome} />
         <Stack.Screen name='Course' component={CoursesScreen}
           options={{
