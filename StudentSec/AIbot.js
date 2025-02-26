@@ -1,24 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, FlatList, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, TextInput, Button, Text, StyleSheet, FlatList, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import OpenAI from 'openai';
 import { getAuth } from 'firebase/auth';
 
-const openai = new OpenAI({
-  apiKey: "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", 
-});
+const OPENAI_API_KEY = "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"; 
+const API_URL = "https://api.openai.com/v1/chat/completions";
 
 const ChatScreen = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([
-    {
-      text: "I'm KIMI, your health AI assistant. How may I help you today?",
-      sender: 'bot',
-    },
+    { text: "I'm KIMI, your health AI assistant. How may I help you today?", sender: 'bot' },
   ]);
-
   const [userId, setUserId] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
+  const scrollViewRef = useRef();
 
   const auth = getAuth();
   useEffect(() => {
@@ -40,7 +35,6 @@ const ChatScreen = () => {
           console.error('Failed to load messages:', error);
         }
       };
-
       loadMessages();
     }
   }, [userId]);
@@ -54,68 +48,62 @@ const ChatScreen = () => {
           console.error('Failed to save messages:', error);
         }
       };
-
       saveMessages();
     }
   }, [messages, userId]);
 
   const handleSend = async () => {
     if (input.trim() === '') return;
-
     const userMessage = { text: input, sender: 'user' };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setInput('');
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",  // Use a valid model name
-        messages: [{ role: "user", content: input }],
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: [{ role: "user", content: input }],
+        }),
       });
 
-      const botMessage = {
-        text: completion.choices[0].message.content,
-        sender: 'bot',
-      };
-      setMessages((prevMessages) => [...prevMessages, botMessage]);
+      const data = await response.json();
+      if (response.ok && data.choices) {
+        const botMessage = { text: data.choices[0].message.content, sender: 'bot' };
+        setMessages((prevMessages) => [...prevMessages, botMessage]);
+      } else {
+        throw new Error(data.error?.message || "Failed to get a response from AI.");
+      }
     } catch (error) {
       console.error('OpenAI API Error:', error);
-      let errorMessage;
-      if (error.response && error.response.status === 429) {
-        errorMessage = {
-          text: "You have exceeded your quota. Please check your OpenAI plan and billing details.",
-          sender: 'bot',
-        };
-      } else {
-        errorMessage = {
-          text: `Error communicating with the AI: ${error.message}`,
-          sender: 'bot',
-        };
-      }
-      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+      setMessages((prevMessages) => [...prevMessages, { text: `Error: ${error.message}`, sender: 'bot' }]);
     }
-
-    setInput('');
   };
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
-      >
-        <FlatList
-          data={messages}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={({ item }) => (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+        <ScrollView
+          ref={scrollViewRef}
+          onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+          style={styles.messagesContainer}
+        >
+          {messages.map((message, index) => (
             <View
+              key={index}
               style={[
                 styles.messageContainer,
-                item.sender === 'user' ? styles.userMessage : styles.botMessage,
+                message.sender === 'user' ? styles.userMessage : styles.botMessage,
               ]}
             >
-              <Text style={styles.messageText}>{item.text}</Text>
+              <Text style={styles.messageText}>{message.text}</Text>
             </View>
-          )}
-        />
+          ))}
+        </ScrollView>
         <View style={[styles.inputContainer, isFocused && styles.inputFocused]}>
           <TextInput
             style={styles.input}
@@ -135,44 +123,51 @@ const ChatScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
-    backgroundColor: '#fff7f8',
+    backgroundColor: '#F9F9F9',
+  },
+  messagesContainer: {
+    flex: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 20,
   },
   messageContainer: {
-    padding: 10,
+    padding: 12,
     marginVertical: 5,
     borderRadius: 10,
+    maxWidth: '80%',
   },
   userMessage: {
     alignSelf: 'flex-end',
-    backgroundColor: '#1E90FF', 
+    backgroundColor: '#0078FF',
+    color: '#fff',
   },
   botMessage: {
     alignSelf: 'flex-start',
-    backgroundColor: '#151B54', 
+    backgroundColor: '#E0E0E0',
   },
   messageText: {
-    color: '#ffffff', 
+    color: '#000',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: '#fff',
-    borderTopColor: '#ccc',
+    backgroundColor: '#FFF',
+    borderTopColor: '#ddd',
     borderTopWidth: 1,
   },
   inputFocused: {
-    marginTop: -10,
-    backgroundColor: '#D3D3D3', 
+    borderTopColor: '#0078FF',
+    borderTopWidth: 2,
   },
   input: {
     flex: 1,
-    borderColor: '#ccc',
+    borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
     marginRight: 10,
+    backgroundColor: '#FFF',
   },
 });
 

@@ -2,21 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { db } from '../../FirebaseConfig'; 
 import { getAuth } from 'firebase/auth';
-import { collection, getDocs, query, where, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, getDoc, setDoc } from 'firebase/firestore';
 
 const QuizScreen = ({ route, navigation }) => {
   const auth = getAuth();
   const currentUser = auth.currentUser;
   const userId = currentUser ? currentUser.uid : null; 
   const { courseId, courseName } = route.params || {};  // Safely destructure route params
-
-  if (!courseId || !courseName) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.noQuizText}>Invalid course or quiz data.</Text>
-      </View>
-    );
-  }
 
   const [quiz, setQuiz] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -149,21 +141,36 @@ const QuizScreen = ({ route, navigation }) => {
         return;
       }
 
-      // Register the score if no previous score is found
-      const scoreRef = doc(db, 'quizScores', `${userId}_${courseId}`);
-      await setDoc(scoreRef, {
-        userId,
-        courseId,
-        scorePercentage,
-      });
+      // Fetch user name
+      const userRef = collection(db, 'users');
+      const q = query(userRef, where('uid', '==', userId));
+      const querySnapshot = await getDocs(q);
 
-      setIsRegistered(true); // Set to true so next time the registration prompt doesn't show
-      Alert.alert('Quiz Completed', `Your score: ${scorePercentage.toFixed(2)}%`, [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
+      if (!querySnapshot.empty) {
+        const userData = querySnapshot.docs[0].data();
+        const userName = userData.name;
+        console.log('Fetched User Name:', userName); // Log the fetched user name
+        
+        // Register the score if no previous score is found
+        const scoreRef = doc(db, 'quizScores', `${userId}_${courseId}`);
+        await setDoc(scoreRef, {
+          userId,
+          userName,
+          courseId,
+          scorePercentage,
+        });
+
+        setIsRegistered(true); // Set to true so next time the registration prompt doesn't show
+        Alert.alert('Quiz Completed', `Your score: ${scorePercentage.toFixed(2)}%`, [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+      } else {
+        console.error('User document does not exist.');
+        Alert.alert('Error', 'User document does not exist.');
+      }
     } catch (error) {
-      console.error('Error saving score:', error);
-      Alert.alert('Error', 'Failed to save score.');
+      console.error('Error fetching or saving user data:', error);
+      Alert.alert('Error', 'Failed to fetch or save user data.');
     }
   };
 

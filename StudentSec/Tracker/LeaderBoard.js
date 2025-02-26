@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
 import { db } from '../../FirebaseConfig';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 
 const LeaderboardScreen = () => {
   const [leaderboard, setLeaderboard] = useState([]);
@@ -17,10 +17,10 @@ const LeaderboardScreen = () => {
         const studentScores = {};
         snapshot.docs.forEach((doc) => {
           const data = doc.data();
-          const { userId, scorePercentage } = data;
+          const { userId, userName, scorePercentage } = data;
 
           if (!studentScores[userId]) {
-            studentScores[userId] = { totalScore: 0, quizCount: 0 };
+            studentScores[userId] = { totalScore: 0, quizCount: 0, userName };
           }
 
           studentScores[userId].totalScore += scorePercentage;
@@ -29,38 +29,16 @@ const LeaderboardScreen = () => {
 
         // Compute average scores and sort the leaderboard
         const leaderboardData = Object.keys(studentScores).map((userId) => {
-          const { totalScore, quizCount } = studentScores[userId];
+          const { totalScore, quizCount, userName } = studentScores[userId];
           const averageScore = totalScore / quizCount;
 
-          return { userId, averageScore };
+          return { userId, userName, averageScore };
         });
 
         leaderboardData.sort((a, b) => b.averageScore - a.averageScore);
         const top5Leaderboard = leaderboardData.slice(0, 5);
 
-        // Retrieve names for each userId
-        const leaderboardWithNames = await Promise.all(
-          top5Leaderboard.map(async (entry) => {
-            try {
-              // Get user document based on userId matching uid in users collection
-              const userRef = doc(db, 'users', entry.userId);
-              const userDoc = await getDoc(userRef);
-
-              if (userDoc.exists()) {
-                const userName = userDoc.data().name;
-                return { ...entry, name: userName };
-              } else {
-                console.warn(`User ID ${entry.userId} not found in users collection.`);
-                return { ...entry, name: 'Unknown User' };
-              }
-            } catch (error) {
-              console.error(`Error fetching user data for ID ${entry.userId}:`, error);
-              return { ...entry, name: 'Unknown User' };
-            }
-          })
-        );
-
-        setLeaderboard(leaderboardWithNames);
+        setLeaderboard(top5Leaderboard);
       } catch (error) {
         console.error('Error fetching leaderboard:', error);
         Alert.alert('Error', 'Failed to load leaderboard.');
@@ -79,7 +57,7 @@ const LeaderboardScreen = () => {
           renderItem={({ item, index }) => (
             <View style={styles.row}>
               <Text style={styles.rankText}>{index + 1}</Text>
-              <Text style={styles.nameText}>{item.name}</Text>
+              <Text style={styles.nameText}>{item.userName}</Text>
               <Text style={styles.scoreText}>{item.averageScore.toFixed(2)}%</Text>
             </View>
           )}

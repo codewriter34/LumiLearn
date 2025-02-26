@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, ScrollView } from 'react-native';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { auth, db } from './FirebaseConfig';
 
@@ -13,7 +13,6 @@ const RegisterScreen = ({ navigation }) => {
   const [isStudent, setIsStudent] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Clear error message after 5 seconds
   useEffect(() => {
     if (errorMessage) {
       const timeout = setTimeout(() => setErrorMessage(''), 5000);
@@ -33,6 +32,9 @@ const RegisterScreen = ({ navigation }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // Send verification email
+      await sendEmailVerification(user);
+
       // Add user data to Firestore
       const userRef = collection(db, 'users');
       await addDoc(userRef, {
@@ -43,7 +45,7 @@ const RegisterScreen = ({ navigation }) => {
         uid: user.uid,
       });
 
-      Alert.alert('Success', 'Registration complete! Please log in.');
+      Alert.alert('Success', 'Registration complete! Please verify your email before logging in.');
       setIsLoginMode(true); // Switch to login mode
     } catch (error) {
       console.error('Firebase Error:', error);
@@ -68,6 +70,13 @@ const RegisterScreen = ({ navigation }) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+
+      // Check if the email is verified
+      if (!user.emailVerified) {
+        setErrorMessage('Please verify your email before logging in.');
+        await auth.signOut();
+        return;
+      }
 
       // Fetch user role from Firestore
       const userRef = collection(db, 'users');
@@ -106,6 +115,21 @@ const RegisterScreen = ({ navigation }) => {
       } else {
         setErrorMessage('An unexpected error occurred. Please try again.');
       }
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setErrorMessage('Please enter your email to reset your password.');
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      Alert.alert('Password Reset', 'A password reset link has been sent to your email.');
+    } catch (error) {
+      console.error('Firebase Error:', error);
+      setErrorMessage('Failed to send password reset email. Please try again.');
     }
   };
 
@@ -184,6 +208,12 @@ const RegisterScreen = ({ navigation }) => {
         >
           <Text style={styles.buttonText}>{isLoginMode ? 'Login' : 'Register'}</Text>
         </TouchableOpacity>
+
+        {isLoginMode && (
+          <TouchableOpacity onPress={handleForgotPassword}>
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity onPress={() => setIsLoginMode(!isLoginMode)}>
           <Text style={styles.toggleText}>
@@ -264,6 +294,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  forgotPasswordText: {
+    color: '#151B54',
+    fontSize: 16,
+    marginTop: 10,
   },
   toggleText: {
     color: '#151B54',
