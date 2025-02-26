@@ -26,6 +26,7 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
+    
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="LoadingScreen" component={LoadingScreen} />
@@ -57,22 +58,25 @@ export default function App() {
             <Stack.Screen name="CoursesForQuiz" component={CoursesForQuiz}
                       options={{
                         headerShown: true,
-                        headerTitle: 'Set Quiz',
+                        headerTitle: 'Take quiz',
                         headerBackTitle: 'Back',
                           }} />
-           <Stack.Screen name="TakeQuiz" component={TakeQuiz} />
-                
+           <Stack.Screen name="TakeQuiz" component={TakeQuiz} options={{
+                        headerShown: true,
+                        headerTitle: 'Take Quiz',
+                        headerBackTitle: 'Back',
+                          }}/>
             <Stack.Screen name="QuizScreen" component={QuizScreen} 
                       options={{
                         headerShown: true,
-                        headerTitle: 'Set Quiz',
+                        headerTitle: 'Quiz exam',
                         headerBackTitle: 'Back',
                           }}/>
             <Stack.Screen name='Tracker' component={Tracker}
             options={{
               headerShown: true,
-              headerTitle: 'Set Quiz',
-              
+              headerTitle: 'Tracker',
+              headerBackTitle: 'Back',
                 }}
             />
             <Stack.Screen name='ChatScreen' component={ChatScreen}

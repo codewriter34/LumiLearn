@@ -84,6 +84,16 @@ const ProfileScreen = ({ navigation }) => {
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      await auth.signOut();
+      navigation.replace('RegisterScreen');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      Alert.alert('Failed to sign out. Please try again.');
+    }
+  };
+
   return (
     <ScrollView style={[styles.container, darkMode && styles.darkBackground]}>
       {/* Profile Picture */}
@@ -179,7 +189,7 @@ const ProfileScreen = ({ navigation }) => {
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
         <Text style={styles.buttonText}>Save Changes</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.logoutButton} onPress={() => auth.signOut()}>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </ScrollView>
