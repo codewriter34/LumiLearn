@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, FlatList, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
+import { 
+  View, TextInput, Button, Text, StyleSheet, ScrollView, 
+  KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard 
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth } from 'firebase/auth';
+import { OPENAI_API_KEY } from '@env'; // Import API key from .env file
 
-const OPENAI_API_KEY = "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"; 
 const API_URL = "https://api.openai.com/v1/chat/completions";
 
 const ChatScreen = () => {
@@ -16,6 +19,7 @@ const ChatScreen = () => {
   const scrollViewRef = useRef();
 
   const auth = getAuth();
+  
   useEffect(() => {
     const currentUser = auth.currentUser;
     if (currentUser) {
@@ -54,6 +58,7 @@ const ChatScreen = () => {
 
   const handleSend = async () => {
     if (input.trim() === '') return;
+    
     const userMessage = { text: input, sender: 'user' };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setInput('');
@@ -72,6 +77,7 @@ const ChatScreen = () => {
       });
 
       const data = await response.json();
+      
       if (response.ok && data.choices) {
         const botMessage = { text: data.choices[0].message.content, sender: 'bot' };
         setMessages((prevMessages) => [...prevMessages, botMessage]);

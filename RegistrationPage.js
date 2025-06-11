@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, ScrollView, Dimensions } from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { auth, db } from './FirebaseConfig';
@@ -187,7 +187,7 @@ const RegisterScreen = ({ navigation }) => {
               onPress={() => setIsStudent(true)}
             >
               <View style={[styles.checkbox, isStudent && styles.checkedCheckbox]} />
-              <Text style={styles.checkboxLabel}>Register as a Student</Text>
+              <Text style={styles.checkboxLabel}>Register as Student</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -197,7 +197,7 @@ const RegisterScreen = ({ navigation }) => {
               <View
                 style={[styles.checkbox, !isStudent && styles.checkedCheckbox]}
               />
-              <Text style={styles.checkboxLabel}>Register as a Lecturer</Text>
+              <Text style={styles.checkboxLabel}>Register as Lecturer</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -243,6 +243,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#151B54',
     marginBottom: 40,
+    textAlign: 'center',
   },
   input: {
     width: '100%',
@@ -258,9 +259,11 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 16,
     marginBottom: 10,
+    textAlign: 'center',
   },
   checkboxGroup: {
     marginVertical: 20,
+    width: '100%',
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -281,6 +284,7 @@ const styles = StyleSheet.create({
   checkboxLabel: {
     fontSize: 16,
     color: '#151B54',
+    flexShrink: 1,
   },
   button: {
     width: '100%',
@@ -289,6 +293,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 20,
   },
   buttonText: {
     color: '#fff',
@@ -304,6 +309,7 @@ const styles = StyleSheet.create({
     color: '#151B54',
     fontSize: 16,
     marginTop: 20,
+    textAlign: 'center',
   },
 });
 
